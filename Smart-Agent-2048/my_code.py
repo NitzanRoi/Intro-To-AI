@@ -1,4 +1,4 @@
-## tests ##
+## my code ##
 import math
 
 SUCCESS = 1
@@ -27,7 +27,7 @@ class Stack:
             print(i.get_val())
 
 class DFS:
-    # calculating DFS on a given tree
+    # calculating DFS on a given tree (currently only binary tree)
     def __init__(self, goal_state, init_state):
         self.stack = Stack()
         self.init_state_children = list()
@@ -41,10 +41,11 @@ class DFS:
            self.init_state_children.append(cur_state) 
 
     def calc_dfs(self, is_search, cur_state=False):
+		# if current state has no successors and isn't the goal:
         if (self.stack.get_stack_size() == 1 and
             not cur_state.get_right_successor() and
             not cur_state.get_left_successor() and
-            not cur_state.get_val() == self.goal_state.get_val()): # (has no successors and isn't the goal)
+            not cur_state.get_val() == self.goal_state.get_val()):
             self.print_or_children(is_search, cur_state)
             return FAILURE if is_search else CALC_CHILDREN_DONE
         if (cur_state == False):
@@ -63,18 +64,18 @@ class DFS:
             self.stack.push_stack(cur_state.get_left_successor())
         return self.calc_dfs(is_search, self.stack.pop_stack())
 
-    # def get_all_children(self, init_state=None):
-    #     if (init_state is None):
-    #         print('please fill init state')
-    #         return FAILURE
-    #     else:
-    #         self.init_state = init_state # node to start DFS with
-    #         self.goal_state = State(EMPTY)
-    #     dfs_result = self.calc_dfs(is_search=False)
-    #     self.stack = Stack()
-    #     if (dfs_result == CALC_CHILDREN_DONE):
-    #         return self.init_state_children
-    #     return dfs_result
+    def get_all_children(self, init_state=None):
+        if (init_state is None):
+            print('please fill init state')
+            return FAILURE
+        else:
+            self.init_state = init_state # node to start the DFS with
+            self.goal_state = State(EMPTY)
+        dfs_result = self.calc_dfs(is_search=False)
+        self.stack = Stack()
+        if (dfs_result == CALC_CHILDREN_DONE):
+            return self.init_state_children
+        return dfs_result
 
 class State:
     # node in the tree
@@ -88,7 +89,7 @@ class State:
         self.right_successor = right_successor
 
     def get_val(self):
-        return int(self.value)
+        return self.value
 
     def get_left_successor(self):
         return self.left_successor
@@ -99,9 +100,9 @@ class State:
 class MiniMax:
     # MiniMax algorithm
     def __init__(self):
-        self.init_tree()
+        self.init_minimax_tree()
 
-    def init_tree(self): 
+    def init_minimax_tree(self): 
         # todo fill it correctly. 
         # first DEBUG
         # then understand how to use this function to the 2048 game
@@ -138,7 +139,7 @@ class MiniMax:
 
     def maximize(self, cur_state):
         if (self.is_state_leaf(cur_state)):
-            return None, cur_state.get_val()
+            return None, int(cur_state.get_val())
         max_child, max_utility = None, -math.inf
         for child in self.get_node_children(cur_state):
             if child is None:
@@ -150,7 +151,7 @@ class MiniMax:
 
     def minimize(self, cur_state):
         if (self.is_state_leaf(cur_state)):
-            return None, cur_state.get_val()
+            return None, int(cur_state.get_val())
         min_child, min_utility = None, math.inf
         for child in self.get_node_children(cur_state):
             if child is None:
@@ -160,35 +161,58 @@ class MiniMax:
                 min_child, min_utility = child, max_utility
         return min_child, min_utility
 
-class Pruning: # TODO from here
+class Pruning: # todo from here
     # Alpha - Beta pruning algorithm
     def __init__(self):
         pass
 
+class Test:
+	# class for tests
+	def __init__(self):
+		pass
+
+	def init_dfs_test_tree(self):
+		o = State('5')
+		n = State('3')
+		m = State('9')
+		l = State('8')
+		k = State('4')
+		j = State('7')
+		i = State('9')
+		h = State('2')
+		g = State('16', n, o)
+		f = State('15', l, m)
+		e = State('14', j, k)
+		d = State('13', h, i)
+		c = State('12', f, g)
+		b = State('11', d, e)
+		a = State('10', b, c)
+		self.goal_state = k
+		self.init_state = a
+		self.dfs = DFS(self.goal_state, self.init_state)
+
+	def test_dfs_print_children(self):
+		print('all children - dfs order')
+		res = self.dfs.get_all_children(init_state=self.init_state)
+		for i in res:
+			print(i.get_val())
+	
+	def test_dfs_search_and_print(self):
+		print('search the goal state mentioned above')
+		res = self.dfs.calc_dfs(is_search=True)
+		print('res: ' + str(res))
+
+	def test_minimax(self):
+		mm = MiniMax()
+
 def main():
-    mm = MiniMax()
-    
-    # currently problem with max recursion. debug it in a notebook
-    # x = State('33333')
-    # g = State('6')
-    # f = State('5')
-    # e = State('4')
-    # d = State('3')
-    # c = State('2', f, g)
-    # b = State('1',d ,e)
-    # a = State('0', b, c)
-    
-    # dfs = DFS(c, a) # params: goal_state, init_state
+	test_obj = Test()
+	
+	# test_obj.init_dfs_test_tree()
+	# test_obj.test_dfs_print_children()
+	# test_obj.test_dfs_search_and_print()
 
-    # choose option: get children or search node (goal_state):
+	# test_obj.test_minimax()
 
-    # print('all children - dfs order')
-    # res = dfs.get_children(init_state=a)
-    # for i in res:
-    #     print(i.get_val())
-
-    # print('search')
-    # res = dfs.calc_dfs(is_search=True)
-    # print('res: ' + str(res))
- 
-main()
+if __name__ == "__main__":
+    main()
