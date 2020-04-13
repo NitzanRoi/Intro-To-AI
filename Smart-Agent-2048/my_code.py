@@ -40,11 +40,15 @@ class DFS:
         else:
            self.init_state_children.append(cur_state) 
 
+    def push_stack_list_of_nodes(self, cur_state):
+        if (cur_state.has_successors()):
+            for successor in cur_state.get_successors():
+                self.stack.push_stack(successor)
+
     def calc_dfs(self, is_search, cur_state=False):
 		# if current state has no successors and isn't the goal:
         if (self.stack.get_stack_size() == 1 and
-            not cur_state.get_right_successor() and
-            not cur_state.get_left_successor() and
+            not cur_state.has_successors() and
             not cur_state.get_val() == self.goal_state.get_val()):
             self.print_or_children(is_search, cur_state)
             return FAILURE if is_search else CALC_CHILDREN_DONE
@@ -58,10 +62,7 @@ class DFS:
             self.print_or_children(is_search, cur_state)
             return SUCCESS
         self.print_or_children(is_search, cur_state)
-        if (cur_state.get_right_successor()):
-            self.stack.push_stack(cur_state.get_right_successor())
-        if (cur_state.get_left_successor()):
-            self.stack.push_stack(cur_state.get_left_successor())
+        self.push_stack_list_of_nodes(cur_state)
         return self.calc_dfs(is_search, self.stack.pop_stack())
 
     def get_all_children(self, init_state=None):
@@ -80,23 +81,21 @@ class DFS:
 class State:
     # represents a node in the tree
 
-    # todo: currently binary tree but should be extended 
-    # to have more than 2 children in each level. 
-    # First implement the alpha-beta. If the DFS class isn't neccesary, so dont change it.
-    # Change as few as possible (maybe change only the Minimax)..
-    def __init__(self, value, left_successor=None, right_successor=None):
+    # initialize list of children sorted 
+    # from the most right successor (should be index 0)
+    # to the most left successor (should be last index) 
+    def __init__(self, value, successors=[]):
         self.value = value
-        self.left_successor = left_successor
-        self.right_successor = right_successor
+        self.successors = successors
 
     def get_val(self):
         return self.value
 
-    def get_left_successor(self):
-        return self.left_successor
+    def has_successors(self):
+        return len(self.successors) > 0
 
-    def get_right_successor(self):
-        return self.right_successor
+    def get_successors(self):
+        return self.successors
 
 class MiniMax:
     # MiniMax algorithm
@@ -110,27 +109,26 @@ class MiniMax:
         o = State('5')
         n = State('3')
         m = State('9')
-        l = State('8')
-        k = State('4')
-        j = State('7')
-        i = State('9')
-        h = State('2')
-        g = State('16', n, o)
-        f = State('15', l, m)
-        e = State('14', j, k)
-        d = State('13', h , i)
-        c = State('12', f, g)
-        b = State('11', d, e)
-        a = State('10', b, c)
+        l = State('10')
+        k = State('5')
+        j = State('2')
+        i = State('1')
+        h = State('7')
+        g = State('9')
+        f = State('15')
+        e = State('3')
+        d = State('3', [l, k, j, i])
+        c = State('2', [h, g])
+        b = State('1', [e])
+        a = State('0', [d, c, b])
         decision = self.decision(a)
         print('decision (max child): ' + str(decision.get_val()))
 
     def get_node_children(self, node):
-        return [node.get_left_successor(), node.get_right_successor()]
+        return list(reversed(node.get_successors()))
 
     def is_state_leaf(self, cur_state):
-        return (cur_state.get_left_successor() is None and 
-                cur_state.get_right_successor() is None)
+        return not cur_state.has_successors()
 
     def decision(self, cur_state):
         max_child, max_utility = self.maximize(cur_state)
@@ -172,29 +170,28 @@ class Pruning:
 
 		# o = State('5')
 		# n = State('3')
-		# m = State('9')
-		# l = State('8')
-		# k = State('4')
-		# j = State('7')
-		# i = State('9')
-		# h = State('2')
-		g = State('1')
-		f = State('2')
-		e = State('12')
-		d = State('3')
-		c = State('9', f, g)
-		b = State('11', d, e)
-		a = State('10', b, c)
+		m = State('2')
+		l = State('5')
+		k = State('14')
+		j = State('0')
+		i = State('7')
+		h = State('2')
+		g = State('8')
+		f = State('12')
+		e = State('3')
+		d = State('21', [m, l, k])
+		c = State('11', [j, i, h])
+		b = State('1', [g, f, e])
+		a = State('6', [d, c, b])
 
 		decision = self.decision(a)
 		print('decision (max child): ' + str(decision.get_val()))
 
 	def get_node_children(self, node):
-		return [node.get_left_successor(), node.get_right_successor()]
+		return list(reversed(node.get_successors()))
 
 	def is_state_leaf(self, cur_state):
-		return (cur_state.get_left_successor() is None and 
-				cur_state.get_right_successor() is None)
+		return not cur_state.has_successors()
 	
 	def decision(self, cur_state):
 		alpha = -math.inf
@@ -210,9 +207,6 @@ class Pruning:
 		for child in self.get_node_children(cur_state):
 			if child is None:
 				continue
-
-			# print('child (max func): ', child.get_val())
-
 			min_child, min_utility = self.minimize(child, alpha, beta)
 			if (min_utility > max_utility):
 				max_child, max_utility = child, min_utility
@@ -229,9 +223,6 @@ class Pruning:
 		for child in self.get_node_children(cur_state):
 			if child is None:
 				continue
-
-			# print('child (min func): ', child.get_val())
-
 			max_child, max_utility = self.maximize(child, alpha, beta)
 			if (max_utility < min_utility):
 				min_child, min_utility = child, max_utility
@@ -253,27 +244,27 @@ class Test:
 		l = State('8')
 		k = State('4')
 		j = State('7')
-		i = State('9')
-		h = State('2')
-		g = State('16', n, o)
-		f = State('15', l, m)
-		e = State('14', j, k)
-		d = State('13', h, i)
-		c = State('12', f, g)
-		b = State('11', d, e)
-		a = State('10', b, c)
-		self.goal_state = k
+		i = State('5')
+		h = State('4')
+		g = State('8')
+		f = State('7')
+		e = State('6')
+		d = State('3', [i, h])
+		c = State('2', [g, f, e])
+		b = State('1', [d])
+		a = State('0', [c, b])
+		self.goal_state = e
 		self.init_state = a
 		self.dfs = DFS(self.goal_state, self.init_state)
 
 	def test_dfs_print_children(self):
-		print('all children - dfs order')
+		print('print all children - dfs order')
 		res = self.dfs.get_all_children(init_state=self.init_state)
 		for i in res:
 			print(i.get_val())
 
 	def test_dfs_search_and_print(self):
-		print('search the goal state mentioned above')
+		print('search the goal state with value: ', self.goal_state.get_val())
 		res = self.dfs.calc_dfs(is_search=True)
 		print('res: ' + str(res))
 
@@ -290,12 +281,14 @@ class Test:
 def main():
 	test_obj = Test()
 
+    # dont run print and search together:
 	# test_obj.init_dfs_test_tree()
 	# test_obj.test_dfs_print_children()
 	# test_obj.test_dfs_search_and_print()
 
-	test_obj.test_minimax()
-	test_obj.test_pruning()
+	# test_obj.test_minimax()
+	# test_obj.test_pruning()
 
 if __name__ == "__main__":
 	main()
+    
