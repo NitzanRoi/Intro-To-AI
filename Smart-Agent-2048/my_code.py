@@ -84,9 +84,10 @@ class State:
     # initialize list of children sorted 
     # from the most right successor (should be index 0)
     # to the most left successor (should be last index) 
-    def __init__(self, value, successors=[]):
-        self.value = value
+    def __init__(self, value, successors=[], direction=None):
+        self.value = value # max-tile for current move
         self.successors = successors
+        self.direction = direction
 
     def get_val(self):
         return self.value
@@ -96,6 +97,12 @@ class State:
 
     def get_successors(self):
         return self.successors
+
+    def add_successor(self, successor):
+        self.successors.append(successor)
+
+    def get_direction(self):
+        return self.direction
 
 class MiniMax:
     # MiniMax algorithm
