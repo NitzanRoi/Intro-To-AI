@@ -103,16 +103,16 @@ class State:
 
     def get_direction(self):
         return self.direction
+    
+    def init_successors(self):
+        self.successors = []
 
 class MiniMax:
     # MiniMax algorithm
     def __init__(self):
         self.init_minimax_tree()
 
-    def init_minimax_tree(self): 
-        # todo fill it correctly
-        # understand how to use this function to the 2048 game
-        
+    def init_minimax_tree(self):         
         o = State('5')
         n = State('3')
         m = State('9')
@@ -168,31 +168,13 @@ class MiniMax:
 
 class Pruning:
     # Alpha - Beta pruning algorithm
-    def __init__(self):
-        self.init_pruning_tree()
+    def __init__(self, init_state):
+        self.init_state = init_state
 
     def init_pruning_tree(self):
-        # todo fill it correctly
-        # understand how to use this function to the 2048 game
-
-        # o = State('5')
-        # n = State('3')
-        m = State('2')
-        l = State('5')
-        k = State('14')
-        j = State('0')
-        i = State('7')
-        h = State('2')
-        g = State('8')
-        f = State('12')
-        e = State('3')
-        d = State('21', [m, l, k])
-        c = State('11', [j, i, h])
-        b = State('1', [g, f, e])
-        a = State('6', [d, c, b])
-
-        decision = self.decision(a)
-        print('decision (max child): ' + str(decision.get_val()))
+        decision = self.decision(self.init_state)
+        # print('decision (direction): ' + str(decision.get_direction()))
+        return decision.get_direction()
 
     def get_node_children(self, node):
         return list(reversed(node.get_successors()))
@@ -204,7 +186,7 @@ class Pruning:
         alpha = -math.inf
         beta = math.inf
         max_child, max_utility = self.maximize(cur_state, alpha, beta)
-        print("max utility: " + str(max_utility))
+        # print("max utility: " + str(max_utility))
         return max_child
 
     def maximize(self, cur_state, alpha, beta):
