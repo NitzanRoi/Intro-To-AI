@@ -1,5 +1,6 @@
 # Perceptron Learning Algorithm
-# The algorithm should generate an output file called output1.csv
+# The algorithm learns the linear separator according to the given data and 
+# use this information to classify new points.
 
 import sys
 import pandas as pd
@@ -8,7 +9,7 @@ from os import path
 from matplotlib import pyplot as plt
 
 CSV_EXIST_ERROR_MSG = "The given path is not a csv file"
-ARGS_NUM_ERROR_MSG = "The number of arguments is not valid"
+ARGS_NUM_ERROR_MSG = "The number of arguments is not valid. Usage: python3 problem1.py <CSV file>"
 WEIGHTS_NOT_VALID = "The calculated weights are not valid"
 POS_VAL = 1
 NEG_VAL = -1
@@ -37,7 +38,7 @@ class DrawGraph:
     def line_equation(self, x, slope, y_intercept):
         return slope * x + y_intercept
 
-    def draw_line(self): # the separator. TODO check correctness
+    def draw_line(self): # the separator
         if (self.weights[0, 0] == 0 or self.weights[1, 0] == 0):
             sys.exit(WEIGHTS_NOT_VALID)
         slope = -1 * (self.weights[0, 0] / self.weights[1, 0])
@@ -90,10 +91,10 @@ class Perceptron:
         self.weights += true_label * x_i.reshape((x_i.shape[0], 1))
         self.bias += true_label
 
-    def evaluate_new_point(self, x_new, y_new):
+    def evaluate_new_point(self, new_point):
         slope = -1 * (self.weights[0, 0] / self.weights[1, 0])
         y_intercept = (-1 * self.bias) / self.weights[1, 0]
-        label = - 1 if (slope * x_new + y_intercept) > y_new else 1
+        label = - 1 if (slope * new_point[0] + y_intercept) > new_point[1] else 1
         print('new-point label: ', str(label))
 
 class ParseCSV:
@@ -137,8 +138,9 @@ class Test:
     def test_perceptron(self, features_matrix, labels_vector):
         perceptron = Perceptron(features_matrix, labels_vector)
         bias, weights = perceptron.calc_weights()
-        perceptron.evaluate_new_point(10, 0)
-        
+        new_point = (10, 10)
+        perceptron.evaluate_new_point(new_point)
+
         draw = DrawGraph(features_matrix, labels_vector, bias, weights)
         draw.draw_dots()
         draw.draw_line()
@@ -158,7 +160,6 @@ def main(args):
     # test.test_print_csv(csv_file)
 
 if __name__ == "__main__":
-    # execution line: python3 problem1.py input1.csv output1.csv
-    if (len(sys.argv) != 3):
+    if (len(sys.argv) != 2):
          sys.exit(ARGS_NUM_ERROR_MSG)
-    main(sys.argv) # [path to this file, arg 1, arg 2, ...]
+    main(sys.argv) # [path to this file, arg 1, ...]
