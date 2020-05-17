@@ -1,3 +1,7 @@
+# Linear Regression algorithm.
+# Implementation of linear regression with multiple features using gradient descent.
+# Reading data from input2.csv and learning how to give prediction for new points.
+
 import sys
 import pandas as pd
 import numpy as np

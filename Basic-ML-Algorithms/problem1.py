@@ -1,5 +1,5 @@
 # Perceptron Learning Algorithm
-# The algorithm learns the linear separator according to the given data and 
+# The algorithm learns the linear separator according to the given data (input1.csv) and 
 # use this information to classify new points.
 
 import sys
