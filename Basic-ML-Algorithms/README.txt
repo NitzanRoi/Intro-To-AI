@@ -1,1 +1,2 @@
 1. The file problem1.py contains an implementation of the Perceptrone Machine-Learning algorithm
+2. The file problem2.py contains an implementation of the Linear-Regression Machine-Learning algorithm
