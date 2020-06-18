@@ -50,8 +50,8 @@ class TrainTestModel:
     def plot_the_confusion_matrix(self, cm):
         df_cm = pd.DataFrame(cm, range(2), range(2))
         sn.set(font_scale=1.4)
-        sn.heatmap(df_cm, annot=True, annot_kws={
-                   "size": 16}, cmap=plt.cm.Blues, fmt='d')
+        sn.heatmap(df_cm, annot=True,
+                   annot_kws={"size": 16}, cmap=plt.cm.Blues, fmt='d')
         plt.title('Confusion matrix', {'color': 'green'})
         plt.xlabel('Predicted Label')
         plt.ylabel('True Label')
@@ -68,8 +68,8 @@ class TrainTestModel:
         plot_symbol_size = 50
         x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
         y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-        xx, yy = np.meshgrid(np.arange(x_min, x_max, mesh_step_size), np.arange(
-            y_min, y_max, mesh_step_size))
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
+                             np.arange(y_min, y_max, mesh_step_size))
         Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
         # Put the result into a color plot:
         Z = Z.reshape(xx.shape)
@@ -108,7 +108,7 @@ class TrainTestModel:
         k_fold = 5
         grid_search = GridSearchCV(estimator=classifier,
                                    param_grid=tuned_parameters,
-                                   # could be also another metric ('precision', 'recall', 'f1')
+                                   # scoring param could be also another metric ('precision', 'recall', 'f1'):
                                    scoring='accuracy',
                                    cv=k_fold, n_jobs=-1)
         grid_search.fit(self.X_train, self.y_train)
@@ -127,16 +127,16 @@ class TrainTestModel:
     def train_svm_polynomial(self):
         # svm (polynomial kernel) with grid-search for tuning the hyper-parameters:
         print('SVM Polynomial')
-        tuned_parameters = [{'kernel': ['poly'], 'C': [
-            0.1, 1, 3], 'degree': [4, 5, 6], 'gamma': [0.1, 0.5]}]
+        tuned_parameters = [{'kernel': ['poly'],
+                             'C': [0.1, 1, 3], 'degree': [4, 5, 6], 'gamma': [0.1, 0.5]}]
         svc = svm.SVC()
         self.train_model(svc, tuned_parameters)
 
     def train_svm_rbf(self):
         # svm (rbf kernel) with grid-search for tuning the hyper-parameters:
         print('SVM RBF')
-        tuned_parameters = [{'kernel': ['rbf'], 'C': [
-            0.1, 0.5, 1, 5, 10, 50, 100], 'gamma': [0.1, 0.5, 1, 3, 6, 10]}]
+        tuned_parameters = [{'kernel': ['rbf'],
+                             'C': [0.1, 0.5, 1, 5, 10, 50, 100], 'gamma': [0.1, 0.5, 1, 3, 6, 10]}]
         svc = svm.SVC()
         self.train_model(svc, tuned_parameters)
 
@@ -150,16 +150,16 @@ class TrainTestModel:
     def train_knn(self):
         # k-nearest neighbors with grid-search for tuning the hyper-parameters:
         print('KNN')
-        tuned_parameters = [{'n_neighbors': [1, 10, 20, 30,
-                                             40, 50], 'leaf_size': [5, 15, 25, 35, 45, 55, 60]}]
+        tuned_parameters = [{'n_neighbors': [1, 10, 20, 30, 40, 50],
+                             'leaf_size': [5, 15, 25, 35, 45, 55, 60]}]
         knn = KNeighborsClassifier()
         self.train_model(knn, tuned_parameters)
 
     def train_decision_trees(self):
         # decision trees with grid-search for tuning the hyper-parameters:
         print('Decision Trees')
-        tuned_parameters = [
-            {'max_depth': [1, 10, 20, 30, 40, 50], 'min_samples_split': [2, 4, 6, 8, 10]}]
+        tuned_parameters = [{'max_depth': [1, 10, 20, 30, 40, 50],
+                             'min_samples_split': [2, 4, 6, 8, 10]}]
         dt = tree.DecisionTreeClassifier()
         trained_clf = self.train_model(dt, tuned_parameters)
         # train the model with the best parameters - for the tree or the color map
@@ -175,8 +175,8 @@ class TrainTestModel:
     def train_random_forest(self):
         # random forest with grid-search for tuning the hyper-parameters:
         print('Random Forest')
-        tuned_parameters = [
-            {'max_depth': [1, 10, 20, 30, 40, 50], 'min_samples_split': [2, 4, 6, 8, 10]}]
+        tuned_parameters = [{'max_depth': [1, 10, 20, 30, 40, 50],
+                             'min_samples_split': [2, 4, 6, 8, 10]}]
         rf = RandomForestClassifier()
         self.train_model(rf, tuned_parameters)
 
